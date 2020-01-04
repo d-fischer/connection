@@ -16,8 +16,7 @@
     "@types/node": "^12.12.14",
     "@types/ws": "^6.0.4",
     "tslib": "^1.10.0",
-    "universal-websocket-client": "^1.0.2",
-    "ws": "^7.2.1"
+    "universal-websocket-client": "^1.0.2"
   },
   "devDependencies": {
     "@d-fischer/eslint-config": "^1.0.3",
