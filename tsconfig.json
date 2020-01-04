@@ -12,12 +12,7 @@
 		"noImplicitReturns": true,
 		"importHelpers": true,
 		"strict": true,
-		"strictFunctionTypes": false,
-		"strictPropertyInitialization": false,
-		"suppressImplicitAnyIndexErrors": true,
-		"noUnusedLocals": true,
-		"experimentalDecorators": true,
-		"downlevelIteration": true
+		"noUnusedLocals": true
 	},
 	"exclude": ["node_modules", "lib"]
 }

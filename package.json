@@ -1,20 +1,23 @@
 {
-  "name": "LIBRARY_NAME",
+  "name": "@d-fischer/connection",
   "version": "0.0.0",
-  "description": "",
+  "description": "Abstraction for packet-based connections.",
   "keywords": [],
   "main": "lib",
   "module": "es",
   "types": "lib",
   "repository": {
     "type": "git",
-    "url": "https://github.com/d-fischer/LIBRARY_NAME.git"
+    "url": "https://github.com/d-fischer/connection.git"
   },
   "author": "Daniel Fischer <daniel@d-fischer.dev>",
   "license": "MIT",
   "dependencies": {
     "@types/node": "^12.12.14",
-    "tslib": "^1.10.0"
+    "@types/ws": "^6.0.4",
+    "tslib": "^1.10.0",
+    "universal-websocket-client": "^1.0.2",
+    "ws": "^7.2.1"
   },
   "devDependencies": {
     "@d-fischer/eslint-config": "^1.0.3",
