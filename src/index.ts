@@ -1,5 +1,5 @@
-import Connection from './Connection';
+import Connection, { ConnectionInfo } from './Connection';
 import DirectConnection from './DirectConnection';
 import WebSocketConnection from './WebSocketConnection';
 
-export { Connection, DirectConnection, WebSocketConnection };
+export { Connection, ConnectionInfo, DirectConnection, WebSocketConnection };
