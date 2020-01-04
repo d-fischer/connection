@@ -4,24 +4,25 @@ export interface ConnectionInfo {
 	hostName: string;
 	port?: number;
 	secure?: boolean;
-	reconnect?: boolean;
-	pingOnInactivity?: number;
-	pingTimeout?: number;
+	lineBased?: boolean;
 }
 
 abstract class Connection extends EventEmitter {
-	protected _host: string;
-	protected _port?: number;
-	protected _secure: boolean;
+	protected readonly _host: string;
+	protected readonly _port?: number;
+	protected readonly _secure: boolean;
+
+	private readonly _lineBased: boolean;
+	private _currentLine = '';
+
 	protected _connecting: boolean = false;
 	protected _connected: boolean = false;
 	protected _manualDisconnect: boolean = false;
 
-	private _currentLine = '';
-
-	constructor({ hostName, port, secure }: ConnectionInfo) {
+	constructor({ hostName, port, secure, lineBased }: ConnectionInfo) {
 		super();
 		this._secure = Boolean(secure);
+		this._lineBased = Boolean(lineBased);
 		if (port) {
 			this._host = hostName;
 			this._port = port;
@@ -60,13 +61,17 @@ abstract class Connection extends EventEmitter {
 	}
 
 	receiveRaw(data: string) {
+		if (!this._lineBased) {
+			this.emit('receive', data);
+			return;
+		}
 		const receivedLines = data.split('\r\n');
 		this._currentLine += receivedLines.shift() || '';
 		if (receivedLines.length) {
-			this.emit('lineReceived', this._currentLine);
+			this.emit('receive', this._currentLine);
 			this._currentLine = receivedLines.pop() || '';
 			for (const line of receivedLines) {
-				this.emit('lineReceived', line);
+				this.emit('receive', line);
 			}
 		}
 	}
