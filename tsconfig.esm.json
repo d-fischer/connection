@@ -1,6 +1,7 @@
 {
 	"extends": "./tsconfig",
 	"compilerOptions": {
+		"outDir": "es",
 		"declaration": false,
 		"module": "esnext"
 	}
