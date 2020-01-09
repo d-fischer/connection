@@ -29,7 +29,6 @@ class WebSocketConnection extends Connection {
 			this._socket.onerror = () => {};
 
 			this._socket.onclose = ({ wasClean, code, reason }) => {
-				this._socket = undefined;
 				this._connected = false;
 				this._connecting = false;
 				if (wasClean) {
