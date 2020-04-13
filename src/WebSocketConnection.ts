@@ -1,5 +1,5 @@
 import Connection from './Connection';
-import * as WebSocket from 'universal-websocket-client';
+import { WebSocket } from '@d-fischer/isomorphic-ws';
 
 class WebSocketConnection extends Connection {
 	private _socket?: WebSocket;
