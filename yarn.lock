@@ -35,10 +35,10 @@
     eslint-plugin-import "^2.18.2"
     eslint-plugin-jsdoc "^17.0.1"
 
-"@d-fischer/isomorphic-ws@^5.0.1":
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/@d-fischer/isomorphic-ws/-/isomorphic-ws-5.0.1.tgz#f460cc2ba47eeffd9841d0769946a3f2d2e4e48c"
-  integrity sha512-/xNQzZt87z+USPKb9QocOGfT2NJjwNsdwwXYo1hshc2dExMvs3p/eC/DXt5VnHc73/WwKzEYJVPFXnvgTVum3A==
+"@d-fischer/isomorphic-ws@^5.0.2":
+  version "5.0.2"
+  resolved "https://registry.yarnpkg.com/@d-fischer/isomorphic-ws/-/isomorphic-ws-5.0.2.tgz#91bb78f520b6c9e4a820eb80c9be5dfeebdb08ed"
+  integrity sha512-FeULiS37jd5M7nroqUw7kfnntlIW6Kilr2kn38Xjoyw/WZqwdxSAihJ2Y09aoDamrVKEW9/flbo2/y/VwHVZ6g==
 
 "@d-fischer/shared-utils@^2.0.0":
   version "2.0.0"

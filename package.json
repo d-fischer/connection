@@ -20,7 +20,7 @@
   "author": "Daniel Fischer <daniel@d-fischer.dev>",
   "license": "MIT",
   "dependencies": {
-    "@d-fischer/isomorphic-ws": "^5.0.1",
+    "@d-fischer/isomorphic-ws": "^5.0.2",
     "@d-fischer/shared-utils": "^2.0.0",
     "@types/node": "^12.12.14",
     "@types/ws": "^7.2.4",
