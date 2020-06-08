@@ -10,7 +10,25 @@ class DirectConnection extends Connection {
 		return this._port || (this._secure ? 6697 : 6667);
 	}
 
-	async doConnect() {
+	get hasSocket() {
+		return !!this._socket;
+	}
+
+	destroy() {
+		if (this._socket) {
+			this._socket.destroy();
+			this._socket = undefined;
+		}
+		super.destroy();
+	}
+
+	sendRaw(line: string) {
+		if (this._socket) {
+			this._socket.write(line);
+		}
+	}
+
+	protected async doConnect() {
 		return new Promise<void>((resolve, reject) => {
 			this._connecting = true;
 			const connectionErrorListener = (err: Error) => {
@@ -43,21 +61,9 @@ class DirectConnection extends Connection {
 		});
 	}
 
-	get hasSocket() {
-		return !!this._socket;
-	}
-
-	destroy() {
+	protected async doDisconnect(): Promise<void> {
 		if (this._socket) {
-			this._socket.destroy();
-			this._socket = undefined;
-		}
-		super.destroy();
-	}
-
-	sendRaw(line: string) {
-		if (this._socket) {
-			this._socket.write(line);
+			await new Promise(resolve => this._socket!.end(() => resolve));
 		}
 	}
 }

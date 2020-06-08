@@ -43,11 +43,12 @@ abstract class Connection extends EventEmitter {
 		return this.doConnect();
 	}
 
-	disconnect(manually = true) {
+	async disconnect(manually = true) {
 		if (this.hasSocket && manually) {
 			this._manualDisconnect = true;
 		}
-		this.destroy();
+		await this.doDisconnect();
+		this._handleDisconnect();
 	}
 
 	destroy() {
@@ -98,6 +99,7 @@ abstract class Connection extends EventEmitter {
 	}
 
 	protected abstract async doConnect(): Promise<void>;
+	protected abstract async doDisconnect(): Promise<void>;
 
 	protected abstract sendRaw(line: string): void;
 

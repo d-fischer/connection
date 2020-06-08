@@ -8,7 +8,25 @@ class WebSocketConnection extends Connection {
 		return this._port || (this._secure ? 443 : 80);
 	}
 
-	async doConnect() {
+	get hasSocket() {
+		return !!this._socket;
+	}
+
+	destroy() {
+		if (this._socket) {
+			this._socket.close();
+			this._socket = undefined;
+		}
+		super.destroy();
+	}
+
+	sendRaw(line: string) {
+		if (this._socket) {
+			this._socket.send(line);
+		}
+	}
+
+	protected async doConnect() {
 		return new Promise<void>((resolve, reject) => {
 			this._connecting = true;
 			const url = `ws${this._secure ? 's' : ''}://${this._host}:${this.port}`;
@@ -28,13 +46,13 @@ class WebSocketConnection extends Connection {
 			// The following empty error callback needs to exist so connection errors are passed down to `onclose` down below - otherwise the process just crashes instead
 			this._socket.onerror = () => {};
 
-			this._socket.onclose = ({ wasClean, code, reason }) => {
+			this._socket.onclose = e => {
 				this._connected = false;
 				this._connecting = false;
-				if (wasClean) {
+				if (e.wasClean) {
 					this._handleDisconnect();
 				} else {
-					const err = new Error(`[${code}] ${reason}`);
+					const err = new Error(`[${e.code}] ${e.reason}`);
 					this._handleDisconnect(err);
 					reject(err);
 				}
@@ -42,22 +60,8 @@ class WebSocketConnection extends Connection {
 		});
 	}
 
-	get hasSocket() {
-		return !!this._socket;
-	}
-
-	destroy() {
-		if (this._socket) {
-			this._socket.close();
-			this._socket = undefined;
-		}
-		super.destroy();
-	}
-
-	sendRaw(line: string) {
-		if (this._socket) {
-			this._socket.send(line);
-		}
+	protected async doDisconnect(): Promise<void> {
+		this._socket?.close();
 	}
 }
 
