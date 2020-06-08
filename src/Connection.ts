@@ -47,6 +47,7 @@ abstract class Connection extends EventEmitter {
 		if (this.hasSocket && manually) {
 			this._manualDisconnect = true;
 		}
+		this.destroy();
 	}
 
 	destroy() {
