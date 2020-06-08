@@ -18,6 +18,7 @@
     "url": "https://github.com/d-fischer/connection.git"
   },
   "author": "Daniel Fischer <daniel@d-fischer.dev>",
+  "funding": "https://github.com/sponsors/d-fischer",
   "license": "MIT",
   "dependencies": {
     "@d-fischer/isomorphic-ws": "^5.0.2",
