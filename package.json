@@ -36,7 +36,8 @@
     "husky": "^4.2.5",
     "lint-staged": "^10.2.10",
     "prettier": "^2.0.5",
-    "tsukuru": "^0.4.1"
+    "tsukuru": "^0.4.1",
+    "typescript": "~3.8.3"
   },
   "files": [
     "LICENSE",
