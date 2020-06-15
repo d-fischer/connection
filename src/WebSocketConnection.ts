@@ -1,7 +1,7 @@
-import Connection from './Connection';
+import { AbstractConnection } from './AbstractConnection';
 import WebSocket from '@d-fischer/isomorphic-ws';
 
-class WebSocketConnection extends Connection {
+export class WebSocketConnection extends AbstractConnection {
 	private _socket?: WebSocket;
 
 	get port() {
@@ -35,7 +35,7 @@ class WebSocketConnection extends Connection {
 			this._socket.onopen = () => {
 				this._connected = true;
 				this._connecting = false;
-				this.emit('connect');
+				this.emit(this.onConnect);
 				resolve();
 			};
 
@@ -64,5 +64,3 @@ class WebSocketConnection extends Connection {
 		this._socket?.close();
 	}
 }
-
-export default WebSocketConnection;

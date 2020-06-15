@@ -1,9 +1,9 @@
-import Connection from './Connection';
+import { AbstractConnection } from './AbstractConnection';
 
 import { Socket } from 'net';
 import * as tls from 'tls';
 
-class DirectConnection extends Connection {
+export class DirectConnection extends AbstractConnection {
 	private _socket?: Socket;
 
 	get port() {
@@ -40,7 +40,7 @@ class DirectConnection extends Connection {
 			const connectionListener = () => {
 				this._connecting = false;
 				this._connected = true;
-				this.emit('connect');
+				this.emit(this.onConnect);
 				resolve();
 			};
 			if (this._secure) {
@@ -67,5 +67,3 @@ class DirectConnection extends Connection {
 		}
 	}
 }
-
-export default DirectConnection;
