@@ -5,7 +5,7 @@ export class WebSocketConnection extends AbstractConnection {
 	private _socket?: WebSocket;
 
 	get port() {
-		return this._port || (this._secure ? 443 : 80);
+		return this._port;
 	}
 
 	get hasSocket() {
