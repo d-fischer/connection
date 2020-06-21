@@ -45,7 +45,7 @@ export class PersistentConnection<T extends Connection> extends EventEmitter imp
 	}
 
 	get port() {
-		return this._currentConnection?.port ?? this._connectionInfo.port ?? 0;
+		return this._connectionInfo.port;
 	}
 
 	get hasSocket() {
@@ -66,20 +66,23 @@ export class PersistentConnection<T extends Connection> extends EventEmitter imp
 		this._retryTimerGenerator = PersistentConnection._getReconnectWaitTime();
 
 		while (this._connectionRetryCount <= this._retryLimit) {
-			this._currentConnection = new this._type(this._connectionInfo);
-			this._currentConnection.onReceive(line => this.emit(this.onReceive, line));
-			this._currentConnection.onConnect(() => this.emit(this.onConnect));
-			this._currentConnection.onDisconnect((manually, reason) => {
+			const newConnection = (this._currentConnection = new this._type(this._connectionInfo));
+			newConnection.onReceive(line => this.emit(this.onReceive, line));
+			newConnection.onConnect(() => this.emit(this.onConnect));
+			newConnection.onDisconnect((manually, reason) => {
 				this.emit(this.onDisconnect, manually, reason);
 				if (manually) {
 					this.emit(this.onEnd, true);
-					this._currentConnection = undefined;
-				} else {
+					newConnection.disconnect();
+					if (this._currentConnection === newConnection) {
+						this._currentConnection = undefined;
+					}
+				} else if (!this._connecting) {
 					this.reconnect();
 				}
 			});
 			try {
-				await this._currentConnection!.connect();
+				await newConnection.connect();
 				this._connecting = false;
 				return;
 			} catch (e) {
@@ -88,8 +91,11 @@ export class PersistentConnection<T extends Connection> extends EventEmitter imp
 				}
 				this._connectionRetryCount++;
 				const secs = this._retryTimerGenerator.next().value;
-				this._logger?.info(`Retrying in ${secs} seconds`);
+				if (secs !== 0) {
+					this._logger?.info(`Retrying in ${secs} seconds`);
+				}
 				await delay(secs * 1000);
+				this._logger?.info('Trying to reconnect');
 				if (!this._connecting) {
 					return;
 				}

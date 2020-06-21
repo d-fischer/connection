@@ -17,13 +17,11 @@ export interface Connection {
 	disconnect(): Promise<void>;
 
 	sendLine(line: string): void;
-
-	destroy?(): void;
 }
 
 export interface ConnectionInfo {
 	hostName: string;
-	port?: number;
+	port: number;
 	secure?: boolean;
 	lineBased?: boolean;
 }

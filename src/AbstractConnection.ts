@@ -3,7 +3,7 @@ import { Connection, ConnectionInfo } from './Connection';
 
 export abstract class AbstractConnection extends EventEmitter implements Connection {
 	protected readonly _host: string;
-	protected readonly _port?: number;
+	protected readonly _port: number;
 	protected readonly _secure: boolean;
 
 	private readonly _lineBased: boolean;
@@ -20,38 +20,22 @@ export abstract class AbstractConnection extends EventEmitter implements Connect
 
 	constructor({ hostName, port, secure, lineBased }: ConnectionInfo) {
 		super();
-		this._secure = Boolean(secure);
-		this._lineBased = Boolean(lineBased);
-		if (port) {
-			this._host = hostName;
-			this._port = port;
-		} else {
-			const splitHost = hostName.split(':');
-			if (splitHost.length > 2) {
-				throw new Error('malformed hostName');
-			}
-			const [host, splitPort] = splitHost;
-			this._host = host;
-			if (splitPort) {
-				this._port = Number(splitPort);
-			}
-		}
+		this._secure = secure ?? true;
+		this._lineBased = lineBased ?? false;
+		this._host = hostName;
+		this._port = port;
 	}
 
-	async connect() {
-		return this.doConnect();
+	get isConnecting() {
+		return this._connecting;
 	}
 
-	async disconnect(manually = true) {
-		if (this.hasSocket && manually) {
-			this._manualDisconnect = true;
-		}
-		await this.doDisconnect();
-		this._handleDisconnect();
+	get isConnected() {
+		return this._connected;
 	}
 
-	destroy() {
-		this.removeListener();
+	get host() {
+		return this._host;
 	}
 
 	sendLine(line: string): void {
@@ -60,6 +44,9 @@ export abstract class AbstractConnection extends EventEmitter implements Connect
 			this.sendRaw(`${line}\r\n`);
 		}
 	}
+
+	abstract async connect(): Promise<void>;
+	abstract async disconnect(): Promise<void>;
 
 	protected receiveRaw(data: string) {
 		if (!this._lineBased) {
@@ -76,30 +63,6 @@ export abstract class AbstractConnection extends EventEmitter implements Connect
 			}
 		}
 	}
-
-	get isConnecting() {
-		return this._connecting;
-	}
-
-	get isConnected() {
-		return this._connected;
-	}
-
-	get host() {
-		return this._host;
-	}
-
-	protected _handleDisconnect(error?: Error) {
-		this.emit(this.onDisconnect, this._manualDisconnect, error);
-		this.emit(this.onEnd, this._manualDisconnect, error);
-		if (this._manualDisconnect) {
-			this._manualDisconnect = false;
-		}
-		this.destroy();
-	}
-
-	protected abstract async doConnect(): Promise<void>;
-	protected abstract async doDisconnect(): Promise<void>;
 
 	protected abstract sendRaw(line: string): void;
 

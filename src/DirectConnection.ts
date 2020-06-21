@@ -1,69 +1,64 @@
-import { AbstractConnection } from './AbstractConnection';
-
 import { Socket } from 'net';
 import * as tls from 'tls';
+import { AbstractConnection } from './AbstractConnection';
 
 export class DirectConnection extends AbstractConnection {
 	private _socket?: Socket;
 
 	get port() {
-		return this._port || (this._secure ? 6697 : 6667);
+		return this._port;
 	}
 
 	get hasSocket() {
 		return !!this._socket;
 	}
 
-	destroy() {
-		if (this._socket) {
-			this._socket.destroy();
-			this._socket = undefined;
-		}
-		super.destroy();
-	}
-
 	sendRaw(line: string) {
-		if (this._socket) {
-			this._socket.write(line);
-		}
+		this._socket?.write(line);
 	}
 
-	protected async doConnect() {
+	async connect() {
 		return new Promise<void>((resolve, reject) => {
 			this._connecting = true;
-			const connectionErrorListener = (err: Error) => {
-				this._connected = false;
-				this._connecting = false;
-				this._handleDisconnect(err);
-				reject(err);
-			};
-			const connectionListener = () => {
+			if (this._secure) {
+				this._socket = tls.connect(this._port, this._host);
+			} else {
+				this._socket = new Socket();
+				this._socket.connect(this._port, this._host);
+			}
+			this._socket.on('connect', () => {
 				this._connecting = false;
 				this._connected = true;
 				this.emit(this.onConnect);
 				resolve();
-			};
-			if (this._secure) {
-				this._socket = tls.connect(this.port, this._host, {}, connectionListener);
-			} else {
-				this._socket = new Socket();
-				this._socket.connect(this.port, this._host, connectionListener);
-			}
-			this._socket.on('error', connectionErrorListener);
+			});
+			this._socket.on('error', (err: Error) => {
+				this._connected = false;
+				this._connecting = false;
+				this.emit(this.onDisconnect, false, err);
+				reject(err);
+			});
 			this._socket.on('data', (data: Buffer) => {
 				this.receiveRaw(data.toString());
 			});
-			this._socket.on('close', () => {
-				this._connected = false;
-				this._connecting = false;
-				this._handleDisconnect();
+			this._socket.on('close', (hadError: boolean) => {
+				if (!hadError) {
+					this._connected = false;
+					this._connecting = false;
+					this.emit(this.onDisconnect, true);
+				}
 			});
 		});
 	}
 
-	protected async doDisconnect(): Promise<void> {
-		if (this._socket) {
-			await new Promise(resolve => this._socket!.end(() => resolve));
-		}
+	async disconnect() {
+		return new Promise<void>(resolve => {
+			const listener = this.onDisconnect(() => {
+				listener.unbind();
+				resolve();
+			});
+			this._socket?.end();
+			this._socket = undefined;
+		});
 	}
 }

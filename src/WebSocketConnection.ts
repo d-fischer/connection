@@ -12,21 +12,11 @@ export class WebSocketConnection extends AbstractConnection {
 		return !!this._socket;
 	}
 
-	destroy() {
-		if (this._socket) {
-			this._socket.close();
-			this._socket = undefined;
-		}
-		super.destroy();
-	}
-
 	sendRaw(line: string) {
-		if (this._socket) {
-			this._socket.send(line);
-		}
+		this._socket?.send(line);
 	}
 
-	protected async doConnect() {
+	async connect() {
 		return new Promise<void>((resolve, reject) => {
 			this._connecting = true;
 			const url = `ws${this._secure ? 's' : ''}://${this._host}:${this.port}`;
@@ -47,20 +37,32 @@ export class WebSocketConnection extends AbstractConnection {
 			this._socket.onerror = () => {};
 
 			this._socket.onclose = e => {
+				const wasConnected = this._connected;
 				this._connected = false;
 				this._connecting = false;
 				if (e.wasClean) {
-					this._handleDisconnect();
+					this.emit(this.onDisconnect, true);
+					this.emit(this.onEnd, true);
 				} else {
 					const err = new Error(`[${e.code}] ${e.reason}`);
-					this._handleDisconnect(err);
-					reject(err);
+					this.emit(this.onDisconnect, false, err);
+					this.emit(this.onEnd, false, err);
+					if (!wasConnected) {
+						reject(err);
+					}
 				}
 			};
 		});
 	}
 
-	protected async doDisconnect(): Promise<void> {
-		this._socket?.close();
+	async disconnect() {
+		return new Promise<void>(resolve => {
+			const listener = this.onDisconnect(() => {
+				listener.unbind();
+				resolve();
+			});
+			this._socket?.close();
+			this._socket = undefined;
+		});
 	}
 }
