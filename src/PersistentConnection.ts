@@ -1,4 +1,4 @@
-import Logger from '@d-fischer/logger';
+import { Logger } from '@d-fischer/logger';
 import { Constructor, delay } from '@d-fischer/shared-utils';
 import { EventEmitter, EventHandler } from '@d-fischer/typed-event-emitter';
 import { Connection, ConnectionInfo } from './Connection';
