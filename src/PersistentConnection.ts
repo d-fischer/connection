@@ -113,6 +113,10 @@ export class PersistentConnection<T extends Connection> extends EventEmitter imp
 		}
 	}
 
+	assumeExternalDisconnect() {
+		this._currentConnection?.assumeExternalDisconnect();
+	}
+
 	async reconnect() {
 		await this.disconnect();
 		return this.connect();

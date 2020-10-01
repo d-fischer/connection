@@ -16,6 +16,8 @@ export interface Connection {
 
 	disconnect(): Promise<void>;
 
+	assumeExternalDisconnect(): void;
+
 	sendLine(line: string): void;
 }
 

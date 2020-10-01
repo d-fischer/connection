@@ -48,6 +48,12 @@ export abstract class AbstractConnection extends EventEmitter implements Connect
 	abstract async connect(): Promise<void>;
 	abstract async disconnect(): Promise<void>;
 
+	assumeExternalDisconnect() {
+		this._connected = false;
+		this._connecting = false;
+		this.emit(this.onDisconnect, false);
+	}
+
 	protected receiveRaw(data: string) {
 		if (!this._lineBased) {
 			this.emit(this.onReceive, data);
