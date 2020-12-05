@@ -4,19 +4,19 @@ import WebSocket from '@d-fischer/isomorphic-ws';
 export class WebSocketConnection extends AbstractConnection {
 	private _socket?: WebSocket;
 
-	get port() {
+	get port(): number {
 		return this._port;
 	}
 
-	get hasSocket() {
+	get hasSocket(): boolean {
 		return !!this._socket;
 	}
 
-	sendRaw(line: string) {
+	sendRaw(line: string): void {
 		this._socket?.send(line);
 	}
 
-	async connect() {
+	async connect(): Promise<void> {
 		return new Promise<void>((resolve, reject) => {
 			this._connecting = true;
 			const url = `ws${this._secure ? 's' : ''}://${this._host}:${this.port}`;
@@ -55,7 +55,7 @@ export class WebSocketConnection extends AbstractConnection {
 		});
 	}
 
-	async disconnect() {
+	async disconnect(): Promise<void> {
 		return new Promise<void>(resolve => {
 			const listener = this.onDisconnect(() => {
 				listener.unbind();

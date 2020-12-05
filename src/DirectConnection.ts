@@ -5,19 +5,19 @@ import { AbstractConnection } from './AbstractConnection';
 export class DirectConnection extends AbstractConnection {
 	private _socket?: Socket;
 
-	get port() {
+	get port(): number {
 		return this._port;
 	}
 
-	get hasSocket() {
+	get hasSocket(): boolean {
 		return !!this._socket;
 	}
 
-	sendRaw(line: string) {
+	sendRaw(line: string): void {
 		this._socket?.write(line);
 	}
 
-	async connect() {
+	async connect(): Promise<void> {
 		return new Promise<void>((resolve, reject) => {
 			this._connecting = true;
 			if (this._secure) {
@@ -51,7 +51,7 @@ export class DirectConnection extends AbstractConnection {
 		});
 	}
 
-	async disconnect() {
+	async disconnect(): Promise<void> {
 		return new Promise<void>(resolve => {
 			const listener = this.onDisconnect(() => {
 				listener.unbind();

@@ -1,5 +1,6 @@
-import { EventEmitter, EventHandler } from '@d-fischer/typed-event-emitter';
-import { Connection, ConnectionInfo } from './Connection';
+import type { EventHandler } from '@d-fischer/typed-event-emitter';
+import { EventEmitter } from '@d-fischer/typed-event-emitter';
+import type { Connection, ConnectionInfo } from './Connection';
 
 export abstract class AbstractConnection extends EventEmitter implements Connection {
 	protected readonly _host: string;
@@ -26,15 +27,15 @@ export abstract class AbstractConnection extends EventEmitter implements Connect
 		this._port = port;
 	}
 
-	get isConnecting() {
+	get isConnecting(): boolean {
 		return this._connecting;
 	}
 
-	get isConnected() {
+	get isConnected(): boolean {
 		return this._connected;
 	}
 
-	get host() {
+	get host(): string {
 		return this._host;
 	}
 
@@ -45,16 +46,16 @@ export abstract class AbstractConnection extends EventEmitter implements Connect
 		}
 	}
 
-	abstract async connect(): Promise<void>;
-	abstract async disconnect(): Promise<void>;
+	abstract connect(): Promise<void>;
+	abstract disconnect(): Promise<void>;
 
-	assumeExternalDisconnect() {
+	assumeExternalDisconnect(): void {
 		this._connected = false;
 		this._connecting = false;
 		this.emit(this.onDisconnect, false);
 	}
 
-	protected receiveRaw(data: string) {
+	protected receiveRaw(data: string): void {
 		if (!this._lineBased) {
 			this.emit(this.onReceive, data);
 			return;

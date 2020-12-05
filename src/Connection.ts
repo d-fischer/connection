@@ -1,4 +1,4 @@
-import { EventBinder } from '@d-fischer/typed-event-emitter';
+import type { EventBinder } from '@d-fischer/typed-event-emitter';
 
 export interface Connection {
 	readonly isConnecting: boolean;

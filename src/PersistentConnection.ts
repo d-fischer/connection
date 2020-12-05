@@ -1,7 +1,9 @@
-import { Logger } from '@d-fischer/logger';
-import { Constructor, delay } from '@d-fischer/shared-utils';
-import { EventEmitter, EventHandler } from '@d-fischer/typed-event-emitter';
-import { Connection, ConnectionInfo } from './Connection';
+import type { Logger } from '@d-fischer/logger';
+import type { Constructor } from '@d-fischer/shared-utils';
+import { delay } from '@d-fischer/shared-utils';
+import type { EventHandler } from '@d-fischer/typed-event-emitter';
+import { EventEmitter } from '@d-fischer/typed-event-emitter';
+import type { Connection, ConnectionInfo } from './Connection';
 
 export interface PersistentConnectionConfig {
 	retryLimit?: number;
@@ -32,31 +34,31 @@ export class PersistentConnection<T extends Connection> extends EventEmitter imp
 		this._logger = config.logger;
 	}
 
-	get isConnected() {
+	get isConnected(): boolean {
 		return this._currentConnection?.isConnected ?? false;
 	}
 
-	get isConnecting() {
+	get isConnecting(): boolean {
 		return this._currentConnection?.isConnecting ?? this._connecting;
 	}
 
-	get host() {
+	get host(): string {
 		return this._connectionInfo.hostName;
 	}
 
-	get port() {
+	get port(): number {
 		return this._connectionInfo.port;
 	}
 
-	get hasSocket() {
+	get hasSocket(): boolean {
 		return this._currentConnection?.hasSocket ?? false;
 	}
 
-	sendLine(line: string) {
+	sendLine(line: string): void {
 		this._currentConnection?.sendLine(line);
 	}
 
-	async connect() {
+	async connect(): Promise<void> {
 		if (this._currentConnection || this._connecting) {
 			throw new Error('Connection already present');
 		}
@@ -105,7 +107,7 @@ export class PersistentConnection<T extends Connection> extends EventEmitter imp
 		this.emit(this.onEnd, false, new Error(`Connection failed after trying ${this._retryLimit} times`));
 	}
 
-	async disconnect() {
+	async disconnect(): Promise<void> {
 		this._connecting = false;
 		if (this._currentConnection) {
 			await this._currentConnection.disconnect();
@@ -113,11 +115,11 @@ export class PersistentConnection<T extends Connection> extends EventEmitter imp
 		}
 	}
 
-	assumeExternalDisconnect() {
+	assumeExternalDisconnect(): void {
 		this._currentConnection?.assumeExternalDisconnect();
 	}
 
-	async reconnect() {
+	async reconnect(): Promise<void> {
 		await this.disconnect();
 		return this.connect();
 	}

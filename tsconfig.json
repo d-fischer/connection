@@ -12,7 +12,8 @@
 		"noImplicitReturns": true,
 		"importHelpers": true,
 		"strict": true,
-		"noUnusedLocals": true
+		"noUnusedLocals": true,
+		"isolatedModules": true
 	},
 	"exclude": ["node_modules", "lib"]
 }
