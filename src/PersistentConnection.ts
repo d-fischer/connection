@@ -59,6 +59,11 @@ export class PersistentConnection<T extends Connection> extends EventEmitter imp
 	}
 
 	async connect(): Promise<void> {
+		this._logger?.trace(
+			`PersistentConnection connect currentConnectionExists:${!!this._currentConnection} connecting:${
+				this._connecting
+			}`
+		);
 		if (this._currentConnection || this._connecting) {
 			throw new Error('Connection already present');
 		}
@@ -108,6 +113,7 @@ export class PersistentConnection<T extends Connection> extends EventEmitter imp
 	}
 
 	async disconnect(): Promise<void> {
+		this._logger?.trace('PersistentConnection disconnect');
 		this._connecting = false;
 		if (this._currentConnection) {
 			await this._currentConnection.disconnect();
@@ -116,6 +122,7 @@ export class PersistentConnection<T extends Connection> extends EventEmitter imp
 	}
 
 	assumeExternalDisconnect(): void {
+		this._logger?.trace('PersistentConnection assumeExternalDisconnect');
 		this._currentConnection?.assumeExternalDisconnect();
 	}
 

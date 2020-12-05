@@ -2152,10 +2152,10 @@ tslib@^2.0.0, tslib@^2.0.3:
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.0.3.tgz#8e0741ac45fc0c226e58a17bfc3e64b9bc6ca61c"
   integrity sha512-uZtkfKblCEQtZKBF6EBXVZeQNl82yqtDQdv+eck8u7tdPxjLu2/lp5/uPW+um2tpuxINHWy3GhiccY7QgEaVHQ==
 
-tsukuru@^0.7.1:
-  version "0.7.1"
-  resolved "https://registry.yarnpkg.com/tsukuru/-/tsukuru-0.7.1.tgz#319121a38483f866a89bed3341bac2dbb3fc4199"
-  integrity sha512-oimsb0cWrL2bNtF2KUD/8+QJyxSuprzPH+hBoK6hr7eRFfjSO8x/G3Vm3DaCqfPxHFMQRJi2y3LoJsaYHZYFcw==
+tsukuru@^0.7.2:
+  version "0.7.2"
+  resolved "https://registry.yarnpkg.com/tsukuru/-/tsukuru-0.7.2.tgz#cc7c31e7813ef9ca1ec911c8a383f18f7002c80d"
+  integrity sha512-s1/hI6Pk2Mj2JrK7EhVRYKhr5wHpCCshOY+QzZK5aPeffV9wTO/FAEQwu6VbyVq9okaNbkciunb6R+fTinozlQ==
   dependencies:
     "@oclif/command" "^1.8.0"
     "@oclif/config" "^1.17.0"

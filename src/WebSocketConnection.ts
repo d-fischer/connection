@@ -17,12 +17,14 @@ export class WebSocketConnection extends AbstractConnection {
 	}
 
 	async connect(): Promise<void> {
+		this._logger?.trace('WebSocketConnection connect');
 		return new Promise<void>((resolve, reject) => {
 			this._connecting = true;
 			const url = `ws${this._secure ? 's' : ''}://${this._host}:${this.port}`;
 			this._socket = new WebSocket(url);
 
 			this._socket.onopen = () => {
+				this._logger?.trace('WebSocketConnection onOpen');
 				this._connected = true;
 				this._connecting = false;
 				this.emit(this.onConnect);
@@ -34,10 +36,16 @@ export class WebSocketConnection extends AbstractConnection {
 			};
 
 			// The following empty error callback needs to exist so connection errors are passed down to `onclose` down below - otherwise the process just crashes instead
-			this._socket.onerror = () => {};
+			this._socket.onerror = e => {
+				this._logger?.trace(`WebSocketConnection onError message:${e.message}`);
+				this._logger?.warn(
+					'WebSocket onerror callback called, please change the log level to trace and open an issue with the debug log'
+				);
+			};
 
 			this._socket.onclose = e => {
 				const wasConnected = this._connected;
+				this._logger?.trace(`WebSocketConnection onClose wasConnected:${wasConnected} wasClean:${e.wasClean}`);
 				this._connected = false;
 				this._connecting = false;
 				if (e.wasClean) {
@@ -56,6 +64,7 @@ export class WebSocketConnection extends AbstractConnection {
 	}
 
 	async disconnect(): Promise<void> {
+		this._logger?.trace('WebSocketConnection disconnect');
 		return new Promise<void>(resolve => {
 			const listener = this.onDisconnect(() => {
 				listener.unbind();

@@ -18,6 +18,7 @@ export class DirectConnection extends AbstractConnection {
 	}
 
 	async connect(): Promise<void> {
+		this._logger?.trace('DirectConnection connect');
 		return new Promise<void>((resolve, reject) => {
 			this._connecting = true;
 			if (this._secure) {
@@ -27,12 +28,14 @@ export class DirectConnection extends AbstractConnection {
 				this._socket.connect(this._port, this._host);
 			}
 			this._socket.on('connect', () => {
+				this._logger?.trace('DirectConnection onConnect');
 				this._connecting = false;
 				this._connected = true;
 				this.emit(this.onConnect);
 				resolve();
 			});
 			this._socket.on('error', (err: Error) => {
+				this._logger?.trace(`DirectConnection onError message:${err.message}`);
 				this._connected = false;
 				this._connecting = false;
 				this.emit(this.onDisconnect, false, err);
@@ -42,6 +45,7 @@ export class DirectConnection extends AbstractConnection {
 				this.receiveRaw(data.toString());
 			});
 			this._socket.on('close', (hadError: boolean) => {
+				this._logger?.trace(`DirectConnection onClose hadError:${hadError}`);
 				if (!hadError) {
 					this._connected = false;
 					this._connecting = false;
@@ -52,6 +56,7 @@ export class DirectConnection extends AbstractConnection {
 	}
 
 	async disconnect(): Promise<void> {
+		this._logger?.trace('DirectConnection disconnect');
 		return new Promise<void>(resolve => {
 			const listener = this.onDisconnect(() => {
 				listener.unbind();

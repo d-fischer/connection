@@ -1,3 +1,4 @@
+import type { Logger } from '@d-fischer/logger';
 import type { EventHandler } from '@d-fischer/typed-event-emitter';
 import { EventEmitter } from '@d-fischer/typed-event-emitter';
 import type { Connection, ConnectionInfo } from './Connection';
@@ -6,8 +7,9 @@ export abstract class AbstractConnection extends EventEmitter implements Connect
 	protected readonly _host: string;
 	protected readonly _port: number;
 	protected readonly _secure: boolean;
-
 	private readonly _lineBased: boolean;
+	protected readonly _logger?: Logger;
+
 	private _currentLine = '';
 
 	protected _connecting: boolean = false;
@@ -19,12 +21,13 @@ export abstract class AbstractConnection extends EventEmitter implements Connect
 	readonly onDisconnect = this.registerEvent<EventHandler<[boolean, Error?]>>();
 	readonly onEnd = this.registerEvent<EventHandler<[boolean, Error?]>>();
 
-	constructor({ hostName, port, secure, lineBased }: ConnectionInfo) {
+	constructor({ hostName, port, secure, lineBased }: ConnectionInfo, logger?: Logger) {
 		super();
-		this._secure = secure ?? true;
-		this._lineBased = lineBased ?? false;
 		this._host = hostName;
 		this._port = port;
+		this._secure = secure ?? true;
+		this._lineBased = lineBased ?? false;
+		this._logger = logger;
 	}
 
 	get isConnecting(): boolean {
@@ -50,6 +53,7 @@ export abstract class AbstractConnection extends EventEmitter implements Connect
 	abstract disconnect(): Promise<void>;
 
 	assumeExternalDisconnect(): void {
+		this._logger?.trace('AbstrctConnection assumeExternalDisconnect');
 		this._connected = false;
 		this._connecting = false;
 		this.emit(this.onDisconnect, false);
