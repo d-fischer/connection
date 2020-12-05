@@ -73,7 +73,7 @@ export class PersistentConnection<T extends Connection> extends EventEmitter imp
 		this._retryTimerGenerator = PersistentConnection._getReconnectWaitTime();
 
 		while (this._connectionRetryCount <= this._retryLimit) {
-			const newConnection = (this._currentConnection = new this._type(this._connectionInfo));
+			const newConnection = (this._currentConnection = new this._type(this._connectionInfo, this._logger));
 			newConnection.onReceive(line => this.emit(this.onReceive, line));
 			newConnection.onConnect(() => this.emit(this.onConnect));
 			newConnection.onDisconnect((manually, reason) => {
