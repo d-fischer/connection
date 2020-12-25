@@ -69,10 +69,10 @@ export abstract class AbstractConnection<Options = never> extends EventEmitter i
 			return;
 		}
 		const receivedLines = data.split('\r\n');
-		this._currentLine += receivedLines.shift() || '';
+		this._currentLine += receivedLines.shift() ?? '';
 		if (receivedLines.length) {
 			this.emit(this.onReceive, this._currentLine);
-			this._currentLine = receivedLines.pop() || '';
+			this._currentLine = receivedLines.pop() ?? '';
 			for (const line of receivedLines) {
 				this.emit(this.onReceive, line);
 			}

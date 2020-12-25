@@ -12,13 +12,10 @@ export interface Connection {
 	readonly onDisconnect: EventBinder<[boolean, Error?]>;
 	readonly onEnd: EventBinder<[boolean, Error?]>;
 
-	connect(): Promise<void>;
-
-	disconnect(): Promise<void>;
-
-	assumeExternalDisconnect(): void;
-
-	sendLine(line: string): void;
+	connect: () => Promise<void>;
+	disconnect: () => Promise<void>;
+	assumeExternalDisconnect: () => void;
+	sendLine: (line: string) => void;
 }
 
 export interface ConnectionInfo {

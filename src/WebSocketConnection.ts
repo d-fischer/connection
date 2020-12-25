@@ -37,7 +37,7 @@ export class WebSocketConnection extends AbstractConnection<WebSocketConnectionO
 			};
 
 			this._socket.onmessage = ({ data }: { data: WebSocket.Data }) => {
-				this.receiveRaw(data.toString());
+				this.receiveRaw((data as string | Buffer).toString());
 			};
 
 			// The following empty error callback needs to exist so connection errors are passed down to `onclose` down below - otherwise the process just crashes instead
@@ -50,7 +50,9 @@ export class WebSocketConnection extends AbstractConnection<WebSocketConnectionO
 
 			this._socket.onclose = e => {
 				const wasConnected = this._connected;
-				this._logger?.trace(`WebSocketConnection onClose wasConnected:${wasConnected} wasClean:${e.wasClean}`);
+				this._logger?.trace(
+					`WebSocketConnection onClose wasConnected:${wasConnected.toString()} wasClean:${e.wasClean.toString()}`
+				);
 				this._connected = false;
 				this._connecting = false;
 				if (e.wasClean) {

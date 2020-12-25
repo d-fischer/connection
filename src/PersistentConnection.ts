@@ -15,7 +15,7 @@ export class PersistentConnection<T extends Connection> extends EventEmitter imp
 	private readonly _logger?: Logger;
 
 	private _connecting = false;
-	private _retryTimerGenerator?: Iterator<number>;
+	private _retryTimerGenerator?: Iterator<number, never>;
 	private _connectionRetryCount = 0;
 	private _currentConnection?: Connection;
 
@@ -25,10 +25,10 @@ export class PersistentConnection<T extends Connection> extends EventEmitter imp
 	readonly onEnd = this.registerEvent<[boolean, Error?]>();
 
 	constructor(
-		private _type: Constructor<T>,
-		private _connectionInfo: ConnectionInfo,
+		private readonly _type: Constructor<T>,
+		private readonly _connectionInfo: ConnectionInfo,
 		config: PersistentConnectionConfig = {},
-		private _additionalOptions?: ConnectionOptions<T>
+		private readonly _additionalOptions?: ConnectionOptions<T>
 	) {
 		super();
 		this._retryLimit = config.retryLimit ?? Infinity;
@@ -61,9 +61,9 @@ export class PersistentConnection<T extends Connection> extends EventEmitter imp
 
 	async connect(): Promise<void> {
 		this._logger?.trace(
-			`PersistentConnection connect currentConnectionExists:${!!this._currentConnection} connecting:${
-				this._connecting
-			}`
+			`PersistentConnection connect currentConnectionExists:${Boolean(
+				this._currentConnection
+			).toString()} connecting:${this._connecting.toString()}`
 		);
 		if (this._currentConnection || this._connecting) {
 			throw new Error('Connection already present');
@@ -85,12 +85,12 @@ export class PersistentConnection<T extends Connection> extends EventEmitter imp
 				this.emit(this.onDisconnect, manually, reason);
 				if (manually) {
 					this.emit(this.onEnd, true);
-					newConnection.disconnect();
+					void newConnection.disconnect();
 					if (this._currentConnection === newConnection) {
 						this._currentConnection = undefined;
 					}
 				} else if (!this._connecting) {
-					this.reconnect();
+					void this.reconnect();
 				}
 			});
 			try {
@@ -108,6 +108,7 @@ export class PersistentConnection<T extends Connection> extends EventEmitter imp
 				}
 				await delay(secs * 1000);
 				this._logger?.info('Trying to reconnect');
+				// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 				if (!this._connecting) {
 					return;
 				}
@@ -137,7 +138,7 @@ export class PersistentConnection<T extends Connection> extends EventEmitter imp
 	}
 
 	// yes, this is just fibonacci with a limit
-	private static *_getReconnectWaitTime(): IterableIterator<number> {
+	private static *_getReconnectWaitTime(): Iterator<number, never> {
 		let current = 0;
 		let next = 1;
 

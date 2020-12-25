@@ -45,7 +45,7 @@ export class DirectConnection extends AbstractConnection {
 				this.receiveRaw(data.toString());
 			});
 			this._socket.on('close', (hadError: boolean) => {
-				this._logger?.trace(`DirectConnection onClose hadError:${hadError}`);
+				this._logger?.trace(`DirectConnection onClose hadError:${hadError.toString()}`);
 				if (!hadError) {
 					this._connected = false;
 					this._connecting = false;
