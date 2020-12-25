@@ -1,14 +1,16 @@
 import type { Logger } from '@d-fischer/logger';
-import type { EventHandler } from '@d-fischer/typed-event-emitter';
 import { EventEmitter } from '@d-fischer/typed-event-emitter';
 import type { Connection, ConnectionInfo } from './Connection';
 
-export abstract class AbstractConnection extends EventEmitter implements Connection {
+export type ConnectionOptions<T extends Connection> = T extends AbstractConnection<infer O> ? O : never;
+
+export abstract class AbstractConnection<Options = never> extends EventEmitter implements Connection {
 	protected readonly _host: string;
 	protected readonly _port: number;
 	protected readonly _secure: boolean;
 	private readonly _lineBased: boolean;
 	protected readonly _logger?: Logger;
+	protected readonly _additionalOptions?: Options;
 
 	private _currentLine = '';
 
@@ -16,18 +18,19 @@ export abstract class AbstractConnection extends EventEmitter implements Connect
 	protected _connected: boolean = false;
 	protected _manualDisconnect: boolean = false;
 
-	readonly onReceive = this.registerEvent<EventHandler<[string]>>();
-	readonly onConnect = this.registerEvent<EventHandler<[]>>();
-	readonly onDisconnect = this.registerEvent<EventHandler<[boolean, Error?]>>();
-	readonly onEnd = this.registerEvent<EventHandler<[boolean, Error?]>>();
+	readonly onReceive = this.registerEvent<[string]>();
+	readonly onConnect = this.registerEvent<[]>();
+	readonly onDisconnect = this.registerEvent<[boolean, Error?]>();
+	readonly onEnd = this.registerEvent<[boolean, Error?]>();
 
-	constructor({ hostName, port, secure, lineBased }: ConnectionInfo, logger?: Logger) {
+	constructor({ hostName, port, secure, lineBased }: ConnectionInfo, logger?: Logger, additionalOptions?: Options) {
 		super();
 		this._host = hostName;
 		this._port = port;
 		this._secure = secure ?? true;
 		this._lineBased = lineBased ?? false;
 		this._logger = logger;
+		this._additionalOptions = additionalOptions;
 	}
 
 	get isConnecting(): boolean {
@@ -50,6 +53,7 @@ export abstract class AbstractConnection extends EventEmitter implements Connect
 	}
 
 	abstract connect(): Promise<void>;
+
 	abstract disconnect(): Promise<void>;
 
 	assumeExternalDisconnect(): void {
@@ -78,5 +82,6 @@ export abstract class AbstractConnection extends EventEmitter implements Connect
 	protected abstract sendRaw(line: string): void;
 
 	abstract get hasSocket(): boolean;
+
 	abstract get port(): number;
 }

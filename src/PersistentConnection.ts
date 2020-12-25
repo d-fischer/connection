@@ -1,8 +1,8 @@
 import type { Logger } from '@d-fischer/logger';
 import type { Constructor } from '@d-fischer/shared-utils';
 import { delay } from '@d-fischer/shared-utils';
-import type { EventHandler } from '@d-fischer/typed-event-emitter';
 import { EventEmitter } from '@d-fischer/typed-event-emitter';
+import type { ConnectionOptions } from './AbstractConnection';
 import type { Connection, ConnectionInfo } from './Connection';
 
 export interface PersistentConnectionConfig {
@@ -19,15 +19,16 @@ export class PersistentConnection<T extends Connection> extends EventEmitter imp
 	private _connectionRetryCount = 0;
 	private _currentConnection?: Connection;
 
-	readonly onReceive = this.registerEvent<EventHandler<[string]>>();
-	readonly onConnect = this.registerEvent<EventHandler<[]>>();
-	readonly onDisconnect = this.registerEvent<EventHandler<[boolean, Error?]>>();
-	readonly onEnd = this.registerEvent<EventHandler<[boolean, Error?]>>();
+	readonly onReceive = this.registerEvent<[string]>();
+	readonly onConnect = this.registerEvent<[]>();
+	readonly onDisconnect = this.registerEvent<[boolean, Error?]>();
+	readonly onEnd = this.registerEvent<[boolean, Error?]>();
 
 	constructor(
 		private _type: Constructor<T>,
 		private _connectionInfo: ConnectionInfo,
-		config: PersistentConnectionConfig = {}
+		config: PersistentConnectionConfig = {},
+		private _additionalOptions?: ConnectionOptions<T>
 	) {
 		super();
 		this._retryLimit = config.retryLimit ?? Infinity;
@@ -73,7 +74,11 @@ export class PersistentConnection<T extends Connection> extends EventEmitter imp
 		this._retryTimerGenerator = PersistentConnection._getReconnectWaitTime();
 
 		while (this._connectionRetryCount <= this._retryLimit) {
-			const newConnection = (this._currentConnection = new this._type(this._connectionInfo, this._logger));
+			const newConnection = (this._currentConnection = new this._type(
+				this._connectionInfo,
+				this._logger,
+				this._additionalOptions
+			));
 			newConnection.onReceive(line => this.emit(this.onReceive, line));
 			newConnection.onConnect(() => this.emit(this.onConnect));
 			newConnection.onDisconnect((manually, reason) => {

@@ -1,7 +1,12 @@
-import { AbstractConnection } from './AbstractConnection';
 import WebSocket from '@d-fischer/isomorphic-ws';
+import type { ClientOptions } from 'ws';
+import { AbstractConnection } from './AbstractConnection';
 
-export class WebSocketConnection extends AbstractConnection {
+export interface WebSocketConnectionOptions {
+	wsOptions?: ClientOptions;
+}
+
+export class WebSocketConnection extends AbstractConnection<WebSocketConnectionOptions> {
 	private _socket?: WebSocket;
 
 	get port(): number {
@@ -21,7 +26,7 @@ export class WebSocketConnection extends AbstractConnection {
 		return new Promise<void>((resolve, reject) => {
 			this._connecting = true;
 			const url = `ws${this._secure ? 's' : ''}://${this._host}:${this.port}`;
-			this._socket = new WebSocket(url);
+			this._socket = new WebSocket(url, this._additionalOptions?.wsOptions);
 
 			this._socket.onopen = () => {
 				this._logger?.trace('WebSocketConnection onOpen');

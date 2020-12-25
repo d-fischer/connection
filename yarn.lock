@@ -56,10 +56,10 @@
     "@types/node" "^14.11.2"
     tslib "^2.0.3"
 
-"@d-fischer/typed-event-emitter@^3.1.1":
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/@d-fischer/typed-event-emitter/-/typed-event-emitter-3.1.1.tgz#5858ce3c18fdb1c2ceaf3c6635d87c5f2a0ef02d"
-  integrity sha512-Tfk0ACUOzf292YwR7hFkLZWhgEAfFi9cqmc5zFHYQVNH/Vt5SLsrZrI4ZZaPGJGYpbtQl3726zNMg9Mqof7Ciw==
+"@d-fischer/typed-event-emitter@^3.2.2":
+  version "3.2.2"
+  resolved "https://registry.yarnpkg.com/@d-fischer/typed-event-emitter/-/typed-event-emitter-3.2.2.tgz#99f383938a3b6f4002593ba27ca3f75b8d8d4ac9"
+  integrity sha512-qT53HcoEM644EiDYMG1mz478qcys7p/mya+7d7annFlXmHCJlZ3tfKJWonDf/itKOBdjaaiRqV2goS+85dsWVA==
   dependencies:
     "@types/node" "^14.11.2"
     tslib "^2.0.3"
