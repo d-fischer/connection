@@ -119,11 +119,16 @@ export class PersistentConnection<T extends Connection> extends EventEmitter imp
 	}
 
 	async disconnect(): Promise<void> {
-		this._logger?.trace('PersistentConnection disconnect');
+		this._logger?.trace(
+			`PersistentConnection disconnect currentConnectionExists:${Boolean(
+				this._currentConnection
+			).toString()} connecting:${this._connecting.toString()}`
+		);
 		this._connecting = false;
 		if (this._currentConnection) {
-			await this._currentConnection.disconnect();
+			const lastConnection = this._currentConnection;
 			this._currentConnection = undefined;
+			await lastConnection.disconnect();
 		}
 	}
 
@@ -133,7 +138,9 @@ export class PersistentConnection<T extends Connection> extends EventEmitter imp
 	}
 
 	async reconnect(): Promise<void> {
-		await this.disconnect();
+		void this.disconnect().catch((e: Error) =>
+			this._logger?.error(`Error while disconnecting for the reconnect: ${e.message}`)
+		);
 		return this.connect();
 	}
 

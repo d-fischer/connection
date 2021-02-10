@@ -7,7 +7,7 @@ export interface WebSocketConnectionOptions {
 }
 
 export class WebSocketConnection extends AbstractConnection<WebSocketConnectionOptions> {
-	private _socket?: WebSocket;
+	private _socket: WebSocket | null = null;
 
 	get port(): number {
 		return this._port;
@@ -66,6 +66,13 @@ export class WebSocketConnection extends AbstractConnection<WebSocketConnectionO
 						reject(err);
 					}
 				}
+				if (this._socket) {
+					this._socket.onopen = null!;
+					this._socket.onmessage = null!;
+					this._socket.onerror = null!;
+					this._socket.onclose = null!;
+					this._socket = null;
+				}
 			};
 		});
 	}
@@ -73,12 +80,15 @@ export class WebSocketConnection extends AbstractConnection<WebSocketConnectionO
 	async disconnect(): Promise<void> {
 		this._logger?.trace('WebSocketConnection disconnect');
 		return new Promise<void>(resolve => {
-			const listener = this.onDisconnect(() => {
-				listener.unbind();
+			if (this._socket) {
+				const listener = this.onDisconnect(() => {
+					listener.unbind();
+					resolve();
+				});
+				this._socket.close();
+			} else {
 				resolve();
-			});
-			this._socket?.close();
-			this._socket = undefined;
+			}
 		});
 	}
 }

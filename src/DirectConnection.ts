@@ -3,7 +3,7 @@ import * as tls from 'tls';
 import { AbstractConnection } from './AbstractConnection';
 
 export class DirectConnection extends AbstractConnection {
-	private _socket?: Socket;
+	private _socket: Socket | null = null;
 
 	get port(): number {
 		return this._port;
@@ -51,6 +51,13 @@ export class DirectConnection extends AbstractConnection {
 					this._connecting = false;
 					this.emit(this.onDisconnect, true);
 				}
+				if (this._socket) {
+					this._socket.removeAllListeners('connect');
+					this._socket.removeAllListeners('error');
+					this._socket.removeAllListeners('data');
+					this._socket.removeAllListeners('close');
+					this._socket = null;
+				}
 			});
 		});
 	}
@@ -58,12 +65,15 @@ export class DirectConnection extends AbstractConnection {
 	async disconnect(): Promise<void> {
 		this._logger?.trace('DirectConnection disconnect');
 		return new Promise<void>(resolve => {
-			const listener = this.onDisconnect(() => {
-				listener.unbind();
+			if (this._socket) {
+				const listener = this.onDisconnect(() => {
+					listener.unbind();
+					resolve();
+				});
+				this._socket.end();
+			} else {
 				resolve();
-			});
-			this._socket?.end();
-			this._socket = undefined;
+			}
 		});
 	}
 }
