@@ -41,10 +41,10 @@
     eslint-plugin-import "^2.22.0"
     eslint-plugin-jsdoc "^25.4.3"
 
-"@d-fischer/isomorphic-ws@^5.0.2":
-  version "5.0.4"
-  resolved "https://registry.yarnpkg.com/@d-fischer/isomorphic-ws/-/isomorphic-ws-5.0.4.tgz#d500735c69a9d0db7e135502eaeb30e6bc4c6532"
-  integrity sha512-iNX2+kupoYtTg5snSzvqpa+rgQmnxWbngU5/uV0y4PyuJHJIoWJuTa/KPh+3ruW4UtloqhCpGe8pyb0EGjt9xQ==
+"@d-fischer/isomorphic-ws@^6.0.0":
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/@d-fischer/isomorphic-ws/-/isomorphic-ws-6.0.0.tgz#4ef0062f7c735d202a4901bac67e3b83bc0b80d1"
+  integrity sha512-xRhs0tSFxDAbKIxsfXzSz9+KAsz2P64NesfopsqQLf70adKLt+J8am1IFPssN1GlbDnXF15kzrkc8cogpk02gA==
 
 "@d-fischer/logger@^4.0.0":
   version "4.0.0"
@@ -246,10 +246,10 @@
     "@types/glob" "*"
     "@types/node" "*"
 
-"@types/ws@^7.2.7":
-  version "7.4.4"
-  resolved "https://registry.yarnpkg.com/@types/ws/-/ws-7.4.4.tgz#93e1e00824c1de2608c30e6de4303ab3b4c0c9bc"
-  integrity sha512-d/7W23JAXPodQNbOZNXvl2K+bqAQrCMwlh/nuQsPSQk6Fq0opHoPrUw43aHsvSbIiQPr8Of2hkFbnz1XBFVyZQ==
+"@types/ws@^7.4.6":
+  version "7.4.6"
+  resolved "https://registry.yarnpkg.com/@types/ws/-/ws-7.4.6.tgz#c4320845e43d45a7129bb32905e28781c71c1fff"
+  integrity sha512-ijZ1vzRawI7QoWnTNL8KpHixd2b2XVb9I9HAqI3triPsh1EC0xH0Eg6w2O3TKbDCgiNNlJqfrof6j4T2I+l9vw==
   dependencies:
     "@types/node" "*"
 

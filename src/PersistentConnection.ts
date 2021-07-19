@@ -103,6 +103,7 @@ export class PersistentConnection<T extends Connection> extends EventEmitter imp
 				}
 				this._connectionRetryCount++;
 				const secs = this._retryTimerGenerator.next().value;
+				this._logger?.warn(`Connection error caught: ${(e as Error).message}`);
 				if (secs !== 0) {
 					this._logger?.info(`Retrying in ${secs} seconds`);
 				}
