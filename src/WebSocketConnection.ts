@@ -43,9 +43,6 @@ export class WebSocketConnection extends AbstractConnection<WebSocketConnectionO
 			// The following empty error callback needs to exist so connection errors are passed down to `onclose` down below - otherwise the process just crashes instead
 			this._socket.onerror = e => {
 				this._logger?.trace(`WebSocketConnection onError message:${e.message}`);
-				this._logger?.warn(
-					'WebSocket onerror callback called, please change the log level to trace and open an issue with the debug log'
-				);
 			};
 
 			this._socket.onclose = e => {
