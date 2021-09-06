@@ -23,7 +23,7 @@ export class WebSocketConnection extends AbstractConnection<WebSocketConnectionO
 
 	async connect(): Promise<void> {
 		this._logger?.trace('WebSocketConnection connect');
-		return new Promise<void>((resolve, reject) => {
+		await new Promise<void>((resolve, reject) => {
 			this._connecting = true;
 			const url = `ws${this._secure ? 's' : ''}://${this._host}:${this.port}`;
 			this._socket = new WebSocket(url, this._additionalOptions?.wsOptions);
@@ -76,7 +76,7 @@ export class WebSocketConnection extends AbstractConnection<WebSocketConnectionO
 
 	async disconnect(): Promise<void> {
 		this._logger?.trace('WebSocketConnection disconnect');
-		return new Promise<void>(resolve => {
+		await new Promise<void>(resolve => {
 			if (this._socket) {
 				const listener = this.onDisconnect(() => {
 					listener.unbind();

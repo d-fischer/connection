@@ -19,7 +19,7 @@ export class DirectConnection extends AbstractConnection {
 
 	async connect(): Promise<void> {
 		this._logger?.trace('DirectConnection connect');
-		return new Promise<void>((resolve, reject) => {
+		await new Promise<void>((resolve, reject) => {
 			this._connecting = true;
 			if (this._secure) {
 				this._socket = tls.connect(this._port, this._host);
@@ -64,7 +64,7 @@ export class DirectConnection extends AbstractConnection {
 
 	async disconnect(): Promise<void> {
 		this._logger?.trace('DirectConnection disconnect');
-		return new Promise<void>(resolve => {
+		await new Promise<void>(resolve => {
 			if (this._socket) {
 				const listener = this.onDisconnect(() => {
 					listener.unbind();
