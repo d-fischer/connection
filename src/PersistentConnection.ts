@@ -7,11 +7,14 @@ import type { Connection, ConnectionInfo } from './Connection';
 
 export interface PersistentConnectionConfig {
 	retryLimit?: number;
+	initialRetryLimit?: number;
 	logger?: Logger;
 }
 
 export class PersistentConnection<T extends Connection> extends EventEmitter implements Connection {
 	private readonly _retryLimit = Infinity;
+	private readonly _initialRetryLimit = 3;
+
 	private readonly _logger?: Logger;
 
 	private _connecting = false;
@@ -60,63 +63,7 @@ export class PersistentConnection<T extends Connection> extends EventEmitter imp
 	}
 
 	async connect(): Promise<void> {
-		this._logger?.trace(
-			`PersistentConnection connect currentConnectionExists:${Boolean(
-				this._currentConnection
-			).toString()} connecting:${this._connecting.toString()}`
-		);
-		if (this._currentConnection || this._connecting) {
-			throw new Error('Connection already present');
-		}
-
-		this._connectionRetryCount = 0;
-		this._connecting = true;
-		this._retryTimerGenerator = PersistentConnection._getReconnectWaitTime();
-
-		while (this._connectionRetryCount <= this._retryLimit) {
-			const newConnection = (this._currentConnection = new this._type(
-				this._connectionInfo,
-				this._logger,
-				this._additionalOptions
-			));
-			newConnection.onReceive(line => this.emit(this.onReceive, line));
-			newConnection.onConnect(() => this.emit(this.onConnect));
-			newConnection.onDisconnect((manually, reason) => {
-				this.emit(this.onDisconnect, manually, reason);
-				if (manually) {
-					this.emit(this.onEnd, true);
-					void newConnection.disconnect();
-					if (this._currentConnection === newConnection) {
-						this._currentConnection = undefined;
-					}
-				} else if (!this._connecting) {
-					void this.reconnect();
-				}
-			});
-			try {
-				await newConnection.connect();
-				this._connecting = false;
-				return;
-			} catch (e) {
-				if (!this._connecting) {
-					return;
-				}
-				this._connectionRetryCount++;
-				const secs = this._retryTimerGenerator.next().value;
-				this._logger?.warn(`Connection error caught: ${(e as Error).message}`);
-				if (secs !== 0) {
-					this._logger?.info(`Retrying in ${secs} seconds`);
-				}
-				await delay(secs * 1000);
-				this._logger?.info('Trying to reconnect');
-				// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-				if (!this._connecting) {
-					return;
-				}
-			}
-		}
-
-		this.emit(this.onEnd, false, new Error(`Connection failed after trying ${this._retryLimit} times`));
+		await this._connect(true);
 	}
 
 	async disconnect(): Promise<void> {
@@ -139,10 +86,82 @@ export class PersistentConnection<T extends Connection> extends EventEmitter imp
 	}
 
 	async reconnect(): Promise<void> {
+		await this._reconnect(true);
+	}
+
+	private async _connect(userGenerated = false): Promise<void> {
+		this._logger?.trace(
+			`PersistentConnection connect currentConnectionExists:${Boolean(
+				this._currentConnection
+			).toString()} connecting:${this._connecting.toString()}`
+		);
+		if (this._currentConnection || this._connecting) {
+			throw new Error('Connection already present');
+		}
+
+		this._connectionRetryCount = 0;
+		this._connecting = true;
+		const retryLimit = userGenerated ? this._initialRetryLimit : this._retryLimit;
+		this._retryTimerGenerator = PersistentConnection._getReconnectWaitTime();
+
+		while (this._connectionRetryCount <= retryLimit) {
+			const newConnection = (this._currentConnection = new this._type(
+				this._connectionInfo,
+				this._logger,
+				this._additionalOptions
+			));
+			newConnection.onReceive(line => this.emit(this.onReceive, line));
+			newConnection.onConnect(() => this.emit(this.onConnect));
+			newConnection.onDisconnect((manually, reason) => {
+				this.emit(this.onDisconnect, manually, reason);
+				if (manually) {
+					this.emit(this.onEnd, true);
+					void newConnection.disconnect();
+					if (this._currentConnection === newConnection) {
+						this._currentConnection = undefined;
+					}
+				} else if (!this._connecting) {
+					void this._reconnect();
+				}
+			});
+			try {
+				await newConnection.connect();
+				this._connecting = false;
+				return;
+			} catch (e) {
+				if (!this._connecting) {
+					return;
+				}
+				this._logger?.debug(`Connection error caught: ${(e as Error).message}`);
+				if (this._connectionRetryCount >= retryLimit) {
+					break;
+				}
+				this._connectionRetryCount++;
+				const secs = this._retryTimerGenerator.next().value;
+				if (secs !== 0) {
+					this._logger?.info(`Retrying in ${secs} seconds`);
+				}
+				await delay(secs * 1000);
+				this._logger?.info(userGenerated ? 'Retrying connection' : 'Trying to reconnect');
+				// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+				if (!this._connecting) {
+					return;
+				}
+			}
+		}
+
+		const error = new Error(`Connection failed after trying ${retryLimit} times`);
+		this.emit(this.onEnd, false, error);
+		if (userGenerated) {
+			throw error;
+		}
+	}
+
+	private async _reconnect(userGenerated = false): Promise<void> {
 		void this.disconnect().catch((e: Error) =>
 			this._logger?.error(`Error while disconnecting for the reconnect: ${e.message}`)
 		);
-		return this.connect();
+		return this._connect(userGenerated);
 	}
 
 	// yes, this is just fibonacci with a limit
