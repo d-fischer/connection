@@ -36,8 +36,8 @@ export class WebSocketConnection extends AbstractConnection<WebSocketConnectionO
 				resolve();
 			};
 
-			this._socket.onmessage = ({ data }: { data: WebSocket.Data }) => {
-				this.receiveRaw((data as string | Buffer).toString());
+			this._socket.onmessage = ({ data }) => {
+				this.receiveRaw((data as Buffer).toString());
 			};
 
 			// The following empty error callback needs to exist so connection errors are passed down to `onclose` down below - otherwise the process just crashes instead

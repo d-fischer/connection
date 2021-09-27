@@ -161,7 +161,7 @@ export class PersistentConnection<T extends Connection> extends EventEmitter imp
 		void this.disconnect().catch((e: Error) =>
 			this._logger?.error(`Error while disconnecting for the reconnect: ${e.message}`)
 		);
-		return this._connect(userGenerated);
+		await this._connect(userGenerated);
 	}
 
 	// yes, this is just fibonacci with a limit
