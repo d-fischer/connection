@@ -2,13 +2,12 @@ import type { Logger } from '@d-fischer/logger';
 import type { Constructor } from '@d-fischer/shared-utils';
 import { delay } from '@d-fischer/shared-utils';
 import { EventEmitter } from '@d-fischer/typed-event-emitter';
-import type { ConnectionOptions } from './AbstractConnection';
-import type { Connection, ConnectionInfo } from './Connection';
+import type { InferConnectionOptions } from './AbstractConnection';
+import type { Connection, ConnectionOptions, ConnectionTarget } from './Connection';
 
-export interface PersistentConnectionConfig {
+export interface PersistentConnectionConfig<T> extends ConnectionOptions<T> {
 	retryLimit?: number;
 	initialRetryLimit?: number;
-	logger?: Logger;
 }
 
 export class PersistentConnection<T extends Connection> extends EventEmitter implements Connection {
@@ -29,13 +28,12 @@ export class PersistentConnection<T extends Connection> extends EventEmitter imp
 
 	constructor(
 		private readonly _type: Constructor<T>,
-		private readonly _connectionInfo: ConnectionInfo,
-		config: PersistentConnectionConfig = {},
-		private readonly _additionalOptions?: ConnectionOptions<T>
+		private readonly _target: ConnectionTarget,
+		private readonly _config: PersistentConnectionConfig<InferConnectionOptions<T>> = {}
 	) {
 		super();
-		this._retryLimit = config.retryLimit ?? Infinity;
-		this._logger = config.logger;
+		this._retryLimit = _config.retryLimit ?? Infinity;
+		this._logger = _config.logger;
 	}
 
 	get isConnected(): boolean {
@@ -44,14 +42,6 @@ export class PersistentConnection<T extends Connection> extends EventEmitter imp
 
 	get isConnecting(): boolean {
 		return this._currentConnection?.isConnecting ?? this._connecting;
-	}
-
-	get host(): string {
-		return this._connectionInfo.hostName;
-	}
-
-	get port(): number {
-		return this._connectionInfo.port;
 	}
 
 	get hasSocket(): boolean {
@@ -105,11 +95,7 @@ export class PersistentConnection<T extends Connection> extends EventEmitter imp
 		this._retryTimerGenerator = PersistentConnection._getReconnectWaitTime();
 
 		while (this._connectionRetryCount <= retryLimit) {
-			const newConnection = (this._currentConnection = new this._type(
-				this._connectionInfo,
-				this._logger,
-				this._additionalOptions
-			));
+			const newConnection = (this._currentConnection = new this._type(this._target, this._config));
 			newConnection.onReceive(line => this.emit(this.onReceive, line));
 			newConnection.onConnect(() => this.emit(this.onConnect));
 			newConnection.onDisconnect((manually, reason) => {

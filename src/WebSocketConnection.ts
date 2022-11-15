@@ -1,6 +1,7 @@
-import { WebSocket } from '@d-fischer/isomorphic-ws';
 import type { ClientOptions } from '@d-fischer/isomorphic-ws';
+import { WebSocket } from '@d-fischer/isomorphic-ws';
 import { AbstractConnection } from './AbstractConnection';
+import type { ConnectionOptions, ConnectionTarget } from './Connection';
 
 export interface WebSocketConnectionOptions {
 	wsOptions?: ClientOptions;
@@ -8,9 +9,17 @@ export interface WebSocketConnectionOptions {
 
 export class WebSocketConnection extends AbstractConnection<WebSocketConnectionOptions> {
 	private _socket: WebSocket | null = null;
+	private readonly _url: string;
 
-	get port(): number {
-		return this._port;
+	constructor(target: ConnectionTarget, options: ConnectionOptions<WebSocketConnectionOptions>) {
+		super(options);
+		if (target.hostName && target.port) {
+			this._url = `ws${target.secure ? 's' : ''}://${target.hostName}:${target.port}`;
+		} else if (target.url) {
+			this._url = target.url;
+		} else {
+			throw new Error('WebSocketConnection requires either hostName & port or url to be set');
+		}
 	}
 
 	get hasSocket(): boolean {
@@ -25,8 +34,7 @@ export class WebSocketConnection extends AbstractConnection<WebSocketConnectionO
 		this._logger?.trace('WebSocketConnection connect');
 		await new Promise<void>((resolve, reject) => {
 			this._connecting = true;
-			const url = `ws${this._secure ? 's' : ''}://${this._host}:${this.port}`;
-			this._socket = new WebSocket(url, this._additionalOptions?.wsOptions);
+			this._socket = new WebSocket(this._url, this._additionalOptions?.wsOptions);
 
 			this._socket.onopen = () => {
 				this._logger?.trace('WebSocketConnection onOpen');

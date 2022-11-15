@@ -1,15 +1,10 @@
-import type { Logger } from '@d-fischer/logger';
 import { AbstractConnection } from './AbstractConnection';
-import type { ConnectionInfo } from './Connection';
+import type { ConnectionOptions, ConnectionTarget } from './Connection';
 
 export class DirectConnection extends AbstractConnection {
-	constructor(options: ConnectionInfo, logger?: Logger, additionalOptions?: never) {
+	constructor(target: ConnectionTarget, options: ConnectionOptions<never>) {
 		throw new Error('DirectConnection is not implemented in a browser environment');
-		super(options, logger, additionalOptions);
-	}
-
-	get port(): number {
-		return this._port;
+		super(options);
 	}
 
 	// eslint-disable-next-line @typescript-eslint/class-literal-property-style

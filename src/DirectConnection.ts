@@ -1,12 +1,22 @@
 import { Socket } from 'net';
 import * as tls from 'tls';
 import { AbstractConnection } from './AbstractConnection';
+import type { ConnectionOptions, ConnectionTarget } from './Connection';
 
 export class DirectConnection extends AbstractConnection {
 	private _socket: Socket | null = null;
+	protected readonly _host: string;
+	protected readonly _port: number;
+	protected readonly _secure: boolean;
 
-	get port(): number {
-		return this._port;
+	constructor(target: ConnectionTarget, options?: ConnectionOptions<never>) {
+		super(options);
+		if (!target.hostName || !target.port) {
+			throw new Error('DirectConnection requires hostName and port to be set');
+		}
+		this._host = target.hostName;
+		this._port = target.port;
+		this._secure = target.secure ?? true;
 	}
 
 	get hasSocket(): boolean {

@@ -1,13 +1,10 @@
 import type { Logger } from '@d-fischer/logger';
 import { EventEmitter } from '@d-fischer/typed-event-emitter';
-import type { Connection, ConnectionInfo } from './Connection';
+import type { Connection, ConnectionOptions } from './Connection';
 
-export type ConnectionOptions<T extends Connection> = T extends AbstractConnection<infer O> ? O : never;
+export type InferConnectionOptions<T extends Connection> = T extends AbstractConnection<infer O> ? O : never;
 
 export abstract class AbstractConnection<Options = never> extends EventEmitter implements Connection {
-	protected readonly _host: string;
-	protected readonly _port: number;
-	protected readonly _secure: boolean;
 	private readonly _lineBased: boolean;
 	protected readonly _logger?: Logger;
 	protected readonly _additionalOptions?: Options;
@@ -16,18 +13,14 @@ export abstract class AbstractConnection<Options = never> extends EventEmitter i
 
 	protected _connecting: boolean = false;
 	protected _connected: boolean = false;
-	protected _manualDisconnect: boolean = false;
 
 	readonly onReceive = this.registerEvent<[string]>();
 	readonly onConnect = this.registerEvent<[]>();
 	readonly onDisconnect = this.registerEvent<[boolean, Error?]>();
 	readonly onEnd = this.registerEvent<[boolean, Error?]>();
 
-	constructor({ hostName, port, secure, lineBased }: ConnectionInfo, logger?: Logger, additionalOptions?: Options) {
+	constructor({ lineBased, logger, additionalOptions }: ConnectionOptions<Options> = {}) {
 		super();
-		this._host = hostName;
-		this._port = port;
-		this._secure = secure ?? true;
 		this._lineBased = lineBased ?? false;
 		this._logger = logger;
 		this._additionalOptions = additionalOptions;
@@ -39,10 +32,6 @@ export abstract class AbstractConnection<Options = never> extends EventEmitter i
 
 	get isConnected(): boolean {
 		return this._connected;
-	}
-
-	get host(): string {
-		return this._host;
 	}
 
 	sendLine(line: string): void {
@@ -82,6 +71,4 @@ export abstract class AbstractConnection<Options = never> extends EventEmitter i
 	protected abstract sendRaw(line: string): void;
 
 	abstract get hasSocket(): boolean;
-
-	abstract get port(): number;
 }

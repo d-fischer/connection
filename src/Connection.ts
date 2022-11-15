@@ -1,10 +1,9 @@
+import type { Logger } from '@d-fischer/logger';
 import type { EventBinder } from '@d-fischer/typed-event-emitter';
 
 export interface Connection {
 	readonly isConnecting: boolean;
 	readonly isConnected: boolean;
-	readonly host: string;
-	readonly port: number;
 	readonly hasSocket: boolean;
 
 	readonly onReceive: EventBinder<[string]>;
@@ -18,9 +17,15 @@ export interface Connection {
 	sendLine: (line: string) => void;
 }
 
-export interface ConnectionInfo {
-	hostName: string;
-	port: number;
+export interface ConnectionTarget {
+	hostName?: string;
+	port?: number;
+	url?: string;
 	secure?: boolean;
+}
+
+export interface ConnectionOptions<T> {
 	lineBased?: boolean;
+	logger?: Logger;
+	additionalOptions?: T;
 }
