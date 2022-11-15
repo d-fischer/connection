@@ -11,7 +11,7 @@ export class WebSocketConnection extends AbstractConnection<WebSocketConnectionO
 	private _socket: WebSocket | null = null;
 	private readonly _url: string;
 
-	constructor(target: ConnectionTarget, options: ConnectionOptions<WebSocketConnectionOptions>) {
+	constructor(target: ConnectionTarget, options?: ConnectionOptions<WebSocketConnectionOptions>) {
 		super(options);
 		if (target.hostName && target.port) {
 			this._url = `ws${target.secure ? 's' : ''}://${target.hostName}:${target.port}`;
