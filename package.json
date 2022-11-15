@@ -25,22 +25,22 @@
   "license": "MIT",
   "dependencies": {
     "@d-fischer/isomorphic-ws": "^7.0.0",
-    "@d-fischer/logger": "^4.0.0",
-    "@d-fischer/shared-utils": "^3.0.1",
+    "@d-fischer/logger": "^4.2.0",
+    "@d-fischer/shared-utils": "^3.3.0",
     "@d-fischer/typed-event-emitter": "^3.3.0",
     "@types/node": "^16.7.10",
-    "@types/ws": "^8.2.0",
-    "tslib": "^2.0.3",
-    "ws": "^8.2.2"
+    "@types/ws": "^8.5.3",
+    "tslib": "^2.4.1",
+    "ws": "^8.11.0"
   },
   "devDependencies": {
-    "@d-fischer/eslint-config": "^5.0.0",
-    "eslint": "^7.17.0",
+    "@d-fischer/eslint-config": "^6.1.4",
+    "eslint": "^8.27.0",
     "husky": "^4.3.6",
-    "lint-staged": "^11.1.2",
-    "prettier": "^2.1.2",
-    "tsukuru": "^0.7.2",
-    "typescript": "~4.3.5"
+    "lint-staged": "^13.0.3",
+    "prettier": "^2.7.1",
+    "tsukuru": "^0.7.4",
+    "typescript": "~4.6.4"
   },
   "files": [
     "LICENSE",
