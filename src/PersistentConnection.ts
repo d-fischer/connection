@@ -1,6 +1,6 @@
 import type { Logger } from '@d-fischer/logger';
 import type { Constructor } from '@d-fischer/shared-utils';
-import { delay } from '@d-fischer/shared-utils';
+import { delay, fibWithLimit } from '@d-fischer/shared-utils';
 import { EventEmitter } from '@d-fischer/typed-event-emitter';
 import type { InferConnectionOptions } from './AbstractConnection';
 import type { Connection, ConnectionOptions, ConnectionTarget } from './Connection';
@@ -92,7 +92,7 @@ export class PersistentConnection<T extends Connection> extends EventEmitter imp
 		this._connectionRetryCount = 0;
 		this._connecting = true;
 		const retryLimit = userGenerated ? this._initialRetryLimit : this._retryLimit;
-		this._retryTimerGenerator = PersistentConnection._getReconnectWaitTime();
+		this._retryTimerGenerator = fibWithLimit(120);
 
 		while (this._connectionRetryCount <= retryLimit) {
 			const newConnection = (this._currentConnection = new this._type(this._target, this._config));
@@ -148,20 +148,5 @@ export class PersistentConnection<T extends Connection> extends EventEmitter imp
 			this._logger?.error(`Error while disconnecting for the reconnect: ${e.message}`)
 		);
 		await this._connect(userGenerated);
-	}
-
-	// yes, this is just fibonacci with a limit
-	private static *_getReconnectWaitTime(): Iterator<number, never> {
-		let current = 0;
-		let next = 1;
-
-		while (current < 120) {
-			yield current;
-			[current, next] = [next, current + next];
-		}
-
-		while (true) {
-			yield 120;
-		}
 	}
 }
