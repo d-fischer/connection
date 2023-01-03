@@ -41,9 +41,9 @@ export abstract class AbstractConnection<Options = never> extends EventEmitter i
 		}
 	}
 
-	abstract connect(): Promise<void>;
+	abstract connect(): void;
 
-	abstract disconnect(): Promise<void>;
+	abstract disconnect(): void;
 
 	assumeExternalDisconnect(): void {
 		this._logger?.trace('AbstrctConnection assumeExternalDisconnect');

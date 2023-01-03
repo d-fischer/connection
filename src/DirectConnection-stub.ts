@@ -1,26 +1,23 @@
-import { AbstractConnection } from './AbstractConnection';
-import type { ConnectionOptions, ConnectionTarget } from './Connection';
+import { type EventBinder } from '@d-fischer/typed-event-emitter';
+import { type Connection } from './Connection';
 
-export class DirectConnection extends AbstractConnection {
-	constructor(target: ConnectionTarget, options: ConnectionOptions<never>) {
+export class DirectConnection implements Connection {
+	declare readonly hasSocket: boolean;
+	declare sendRaw: (line: string) => void;
+	declare sendLine: (line: string) => void;
+	declare readonly isConnected: boolean;
+	declare readonly isConnecting: boolean;
+
+	declare readonly connect: () => void;
+	declare readonly disconnect: () => void;
+	declare readonly assumeExternalDisconnect: () => void;
+
+	declare readonly onConnect: EventBinder<[]>;
+	declare readonly onDisconnect: EventBinder<[boolean, Error]>;
+	declare readonly onEnd: EventBinder<[boolean, Error]>;
+	declare readonly onReceive: EventBinder<[string]>;
+
+	constructor() {
 		throw new Error('DirectConnection is not implemented in a browser environment');
-		super(options);
-	}
-
-	// eslint-disable-next-line @typescript-eslint/class-literal-property-style
-	get hasSocket(): boolean {
-		return false;
-	}
-
-	sendRaw(line: string): void {
-		void line;
-	}
-
-	async connect(): Promise<void> {
-		//
-	}
-
-	async disconnect(): Promise<void> {
-		//
 	}
 }

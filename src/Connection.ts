@@ -11,8 +11,8 @@ export interface Connection {
 	readonly onDisconnect: EventBinder<[boolean, Error?]>;
 	readonly onEnd: EventBinder<[boolean, Error?]>;
 
-	connect: () => Promise<void>;
-	disconnect: () => Promise<void>;
+	connect: () => void;
+	disconnect: () => void;
 	assumeExternalDisconnect: () => void;
 	sendLine: (line: string) => void;
 }
