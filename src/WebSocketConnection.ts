@@ -10,6 +10,7 @@ export interface WebSocketConnectionOptions {
 export class WebSocketConnection extends AbstractConnection<WebSocketConnectionOptions> {
 	private _socket: WebSocket | null = null;
 	private readonly _url: string;
+	private _closingOnDemand = false;
 
 	constructor(target: ConnectionTarget, options?: ConnectionOptions<WebSocketConnectionOptions>) {
 		super(options);
@@ -53,12 +54,14 @@ export class WebSocketConnection extends AbstractConnection<WebSocketConnectionO
 
 		this._socket.onclose = e => {
 			const wasConnected = this._connected;
+			const wasConnecting = this._connecting;
 			this._logger?.trace(
-				`WebSocketConnection onClose wasConnected:${wasConnected.toString()} wasClean:${e.wasClean.toString()}`
+				`WebSocketConnection onClose wasConnected:${wasConnected.toString()} wasConnecting:${wasConnecting.toString()} closingOnDemand:${this._closingOnDemand.toString()} wasClean:${e.wasClean.toString()}`
 			);
 			this._connected = false;
 			this._connecting = false;
-			if (e.wasClean) {
+			if (e.wasClean || this._closingOnDemand) {
+				this._closingOnDemand = false;
 				this.emit(this.onDisconnect, true);
 				this.emit(this.onEnd, true);
 			} else {
@@ -78,6 +81,7 @@ export class WebSocketConnection extends AbstractConnection<WebSocketConnectionO
 
 	disconnect(): void {
 		this._logger?.trace('WebSocketConnection disconnect');
+		this._closingOnDemand = true;
 		this._socket?.close();
 	}
 }
