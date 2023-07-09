@@ -69,13 +69,7 @@ export class WebSocketConnection extends AbstractConnection<WebSocketConnectionO
 				this.emit(this.onDisconnect, false, err);
 				this.emit(this.onEnd, false, err);
 			}
-			if (this._socket) {
-				this._socket.onopen = null!;
-				this._socket.onmessage = null!;
-				this._socket.onerror = null!;
-				this._socket.onclose = null!;
-				this._socket = null;
-			}
+			this.clearSocket();
 		};
 	}
 
@@ -83,5 +77,15 @@ export class WebSocketConnection extends AbstractConnection<WebSocketConnectionO
 		this._logger?.trace('WebSocketConnection disconnect');
 		this._closingOnDemand = true;
 		this._socket?.close();
+	}
+
+	protected clearSocket(): void {
+		if (this._socket) {
+			this._socket.onopen = null;
+			this._socket.onmessage = null;
+			this._socket.onerror = null;
+			this._socket.onclose = null;
+			this._socket = null;
+		}
 	}
 }

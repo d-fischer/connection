@@ -58,18 +58,22 @@ export class DirectConnection extends AbstractConnection {
 				this._connecting = false;
 				this.emit(this.onDisconnect, true);
 			}
-			if (this._socket) {
-				this._socket.removeAllListeners('connect');
-				this._socket.removeAllListeners('error');
-				this._socket.removeAllListeners('data');
-				this._socket.removeAllListeners('close');
-				this._socket = null;
-			}
+			this.clearSocket();
 		});
 	}
 
 	disconnect(): void {
 		this._logger?.trace('DirectConnection disconnect');
 		this._socket?.end();
+	}
+
+	protected clearSocket(): void {
+		if (this._socket) {
+			this._socket.removeAllListeners('connect');
+			this._socket.removeAllListeners('error');
+			this._socket.removeAllListeners('data');
+			this._socket.removeAllListeners('close');
+			this._socket = null;
+		}
 	}
 }

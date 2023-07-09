@@ -46,9 +46,10 @@ export abstract class AbstractConnection<Options = never> extends EventEmitter i
 	abstract disconnect(): void;
 
 	assumeExternalDisconnect(): void {
-		this._logger?.trace('AbstrctConnection assumeExternalDisconnect');
+		this._logger?.trace('AbstractConnection assumeExternalDisconnect');
 		this._connected = false;
 		this._connecting = false;
+		this.clearSocket();
 		this.emit(this.onDisconnect, false);
 	}
 
@@ -69,6 +70,7 @@ export abstract class AbstractConnection<Options = never> extends EventEmitter i
 	}
 
 	protected abstract sendRaw(line: string): void;
+	protected abstract clearSocket(): void;
 
 	abstract get hasSocket(): boolean;
 }
