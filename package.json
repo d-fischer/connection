@@ -1,6 +1,6 @@
 {
   "name": "@d-fischer/connection",
-  "version": "8.0.6",
+  "version": "9.0.0",
   "description": "Abstraction for packet-based connections.",
   "keywords": [],
   "main": "lib",
