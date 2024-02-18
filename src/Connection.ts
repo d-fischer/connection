@@ -8,8 +8,8 @@ export interface Connection {
 
 	readonly onReceive: EventBinder<[string]>;
 	readonly onConnect: EventBinder<[]>;
-	readonly onDisconnect: EventBinder<[boolean, Error?]>;
-	readonly onEnd: EventBinder<[boolean, Error?]>;
+	readonly onDisconnect: EventBinder<[onDemand: boolean, error?: Error]>;
+	readonly onEnd: EventBinder<[onDemand: boolean, error?: Error]>;
 
 	connect: () => void;
 	disconnect: () => void;

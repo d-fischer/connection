@@ -9,8 +9,9 @@ export interface WebSocketConnectionOptions {
 
 export class WebSocketConnection extends AbstractConnection<WebSocketConnectionOptions> {
 	private _socket: WebSocket | null = null;
-	private readonly _url: string;
 	private _closingOnDemand = false;
+
+	private readonly _url: string;
 
 	constructor(target: ConnectionTarget, options?: ConnectionOptions<WebSocketConnectionOptions>) {
 		super(options);
@@ -40,6 +41,7 @@ export class WebSocketConnection extends AbstractConnection<WebSocketConnectionO
 			this._logger?.trace('WebSocketConnection onOpen');
 			this._connected = true;
 			this._connecting = false;
+			this._closingOnDemand = false;
 			this.emit(this.onConnect);
 		};
 
@@ -60,7 +62,7 @@ export class WebSocketConnection extends AbstractConnection<WebSocketConnectionO
 			);
 			this._connected = false;
 			this._connecting = false;
-			if (e.wasClean || this._closingOnDemand) {
+			if (this._closingOnDemand) {
 				this._closingOnDemand = false;
 				this.emit(this.onDisconnect, true);
 				this.emit(this.onEnd, true);

@@ -5,6 +5,9 @@ import type { ConnectionOptions, ConnectionTarget } from './Connection';
 
 export class DirectConnection extends AbstractConnection {
 	private _socket: Socket | null = null;
+	private _closingOnDemand = false;
+	private _hadError = false;
+
 	protected readonly _host: string;
 	protected readonly _port: number;
 	protected readonly _secure: boolean;
@@ -40,6 +43,8 @@ export class DirectConnection extends AbstractConnection {
 			this._logger?.trace('DirectConnection onConnect');
 			this._connecting = false;
 			this._connected = true;
+			this._closingOnDemand = false;
+			this._hadError = false;
 			this.emit(this.onConnect);
 		});
 		this._socket.on('error', (err: Error) => {
@@ -47,23 +52,29 @@ export class DirectConnection extends AbstractConnection {
 			this._connected = false;
 			this._connecting = false;
 			this.emit(this.onDisconnect, false, err);
+			this._hadError = true;
 		});
 		this._socket.on('data', (data: Buffer) => {
 			this.receiveRaw(data.toString());
 		});
-		this._socket.on('close', (hadError: boolean) => {
-			this._logger?.trace(`DirectConnection onClose hadError:${hadError.toString()}`);
-			if (!hadError) {
+		this._socket.on('close', () => {
+			this._logger?.trace(
+				`DirectConnection onClose closingOnDemand:${this._closingOnDemand.toString()} hadError:${this._hadError.toString()}`
+			);
+			if (!this._hadError) {
 				this._connected = false;
 				this._connecting = false;
-				this.emit(this.onDisconnect, true);
+				this.emit(this.onDisconnect, this._closingOnDemand);
 			}
+			this._closingOnDemand = false;
+			this._hadError = false;
 			this.clearSocket();
 		});
 	}
 
 	disconnect(): void {
 		this._logger?.trace('DirectConnection disconnect');
+		this._closingOnDemand = true;
 		this._socket?.end();
 	}
 

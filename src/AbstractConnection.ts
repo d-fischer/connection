@@ -16,8 +16,8 @@ export abstract class AbstractConnection<Options = never> extends EventEmitter i
 
 	readonly onReceive = this.registerEvent<[string]>();
 	readonly onConnect = this.registerEvent<[]>();
-	readonly onDisconnect = this.registerEvent<[boolean, Error?]>();
-	readonly onEnd = this.registerEvent<[boolean, Error?]>();
+	readonly onDisconnect = this.registerEvent<[onDemand: boolean, error?: Error]>();
+	readonly onEnd = this.registerEvent<[onDemand: boolean, error?: Error]>();
 
 	constructor({ lineBased, logger, additionalOptions }: ConnectionOptions<Options> = {}) {
 		super();
