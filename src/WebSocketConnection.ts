@@ -1,5 +1,4 @@
-import type { ClientOptions } from '@d-fischer/isomorphic-ws';
-import { WebSocket } from '@d-fischer/isomorphic-ws';
+import { type ClientOptions, WebSocket } from '@d-fischer/isomorphic-ws';
 import { AbstractConnection } from './AbstractConnection';
 import type { ConnectionOptions, ConnectionTarget } from './Connection';
 

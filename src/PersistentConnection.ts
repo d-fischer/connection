@@ -1,6 +1,10 @@
 import type { Logger } from '@d-fischer/logger';
-import type { Constructor, ResolvableValueSync } from '@d-fischer/shared-utils';
-import { fibWithLimit, resolveConfigValueSync } from '@d-fischer/shared-utils';
+import {
+	type Constructor,
+	type ResolvableValueSync,
+	fibWithLimit,
+	resolveConfigValueSync
+} from '@d-fischer/shared-utils';
 import { EventEmitter } from '@d-fischer/typed-event-emitter';
 import type { InferConnectionOptions } from './AbstractConnection';
 import type { Connection, ConnectionOptions, ConnectionTarget } from './Connection';
