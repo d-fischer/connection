@@ -84,6 +84,7 @@ export class DirectConnection extends AbstractConnection {
 			this._socket.removeAllListeners('error');
 			this._socket.removeAllListeners('data');
 			this._socket.removeAllListeners('close');
+			this._socket.resetAndDestroy();
 			this._socket = null;
 		}
 	}

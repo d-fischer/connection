@@ -87,6 +87,7 @@ export class WebSocketConnection extends AbstractConnection<WebSocketConnectionO
 			this._socket.onmessage = null;
 			this._socket.onerror = null;
 			this._socket.onclose = null;
+			this._socket.terminate();
 			this._socket = null;
 		}
 	}
