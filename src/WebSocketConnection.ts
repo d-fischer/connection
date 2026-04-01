@@ -86,7 +86,12 @@ export class WebSocketConnection extends AbstractConnection<WebSocketConnectionO
 			this._socket.onmessage = null;
 			this._socket.onerror = null;
 			this._socket.onclose = null;
-			this._socket.terminate();
+			// browsers don't have the terminate method but it's listed as always available in the types, so we need a cast
+			if (this._socket.terminate as (() => void) | undefined) {
+				this._socket.terminate();
+			} else {
+				this._socket.close();
+			}
 			this._socket = null;
 		}
 	}
